@@ -1,0 +1,15 @@
+c:\users\yoloswag\source\repos\VenturaFTP\VenturaFTP\bin\Debug\VenturaFTP.exe.config
+c:\users\yoloswag\source\repos\VenturaFTP\VenturaFTP\bin\Debug\VenturaFTP.exe
+c:\users\yoloswag\source\repos\VenturaFTP\VenturaFTP\bin\Debug\VenturaFTP.pdb
+c:\users\yoloswag\source\repos\VenturaFTP\VenturaFTP\obj\Debug\MainWindow.g.cs
+c:\users\yoloswag\source\repos\VenturaFTP\VenturaFTP\obj\Debug\App.g.cs
+c:\users\yoloswag\source\repos\VenturaFTP\VenturaFTP\obj\Debug\VenturaFTP_MarkupCompile.cache
+c:\users\yoloswag\source\repos\VenturaFTP\VenturaFTP\obj\Debug\VenturaFTP_MarkupCompile.lref
+c:\users\yoloswag\source\repos\VenturaFTP\VenturaFTP\obj\Debug\MainWindow.baml
+c:\users\yoloswag\source\repos\VenturaFTP\VenturaFTP\obj\Debug\VenturaFTP.g.resources
+c:\users\yoloswag\source\repos\VenturaFTP\VenturaFTP\obj\Debug\VenturaFTP.Properties.Resources.resources
+c:\users\yoloswag\source\repos\VenturaFTP\VenturaFTP\obj\Debug\VenturaFTP.csproj.GenerateResource.cache
+c:\users\yoloswag\source\repos\VenturaFTP\VenturaFTP\obj\Debug\VenturaFTP.csproj.CoreCompileInputs.cache
+c:\users\yoloswag\source\repos\VenturaFTP\VenturaFTP\obj\Debug\VenturaFTP.exe
+c:\users\yoloswag\source\repos\VenturaFTP\VenturaFTP\obj\Debug\VenturaFTP.pdb
+C:\Users\Yoloswag\source\repos\VenturaFTP\VenturaFTP\obj\Debug\VenturaFTP.csprojAssemblyReference.cache
