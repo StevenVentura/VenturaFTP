@@ -18,6 +18,7 @@ namespace VenturaFTP
 {
     class StevenFileSendTelemetry
     {
+        public static readonly byte[] terminalBoy = { 4, 8, 16, 32, 64, 128, 47, 47, 47 };
         public static string StringToSendFromFile(string filepath)
         {
 
@@ -61,16 +62,6 @@ namespace VenturaFTP
         {
 
 
-
-            /*Socket soc = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            System.Net.IPAddress ipAdd = System.Net.IPAddress.Parse("localhost");
-            System.Net.IPEndPoint remoteEP = new IPEndPoint(ipAdd, 8303);
-            soc.Connect(remoteEP);
-            //Start sending stuff..
-            byte[] byData = System.Text.Encoding.ASCII.GetBytes(please);
-            soc.Send(byData);
-            */
-
             Client c = new Client();
             c.DoClientThings("localhost", "C:\\Users\\Yoloswag\\Desktop\\stevenftp\\sendme.txt");
             
@@ -107,50 +98,76 @@ namespace VenturaFTP
                 while (true)
                 {
                     //blocks until a client has connected to the server
-                    Console.WriteLine("beforeboii");
                     TcpClient client = this.tcpListener.AcceptTcpClient();
-                    Console.WriteLine("found a client!");
                     //create a thread to handle communication 
                     //with connected client
                     Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
                     clientThread.Start(client);
                 }
             }
+
             private void HandleClientComm(object client)
             {
                 TcpClient tcpClient = (TcpClient)client;
                 NetworkStream clientStream = tcpClient.GetStream();
 
-                byte[] message = new byte[4096];
-                int bytesRead;
+                ASCIIEncoding encoder = new ASCIIEncoding();
+                string filename = "empty";
 
+                byte[] message = new byte[tcpClient.ReceiveBufferSize];
+                int bytesRead;
+                {   bytesRead = 0;
+               
+                {
+                   
+                    bytesRead = clientStream.Read(message, 0, tcpClient.ReceiveBufferSize);
+                    string headerstring = encoder.GetString(message, 0, bytesRead);
+                        int filepathlength = message[0];
+                    filename = headerstring.Substring(1,filepathlength-1);
+                }
+                    Console.WriteLine("filename=" + filename);
+            }
+               
                 while (true)
                 {
-                    bytesRead = 0;
+                    using (System.IO.StreamWriter file =
+             new System.IO.StreamWriter("C:\\Users\\Yoloswag\\Desktop\\stevenftp\\received\\" + filename, true))
+                    {
+                        
 
-                    try
-                    {
-                        //blocks until a client sends a message
-                        bytesRead = clientStream.Read(message, 0, 4096);
-                    }
-                    catch
-                    {
-                        //a socket error has occured
-                        break;
-                    }
 
-                    if (bytesRead == 0)
-                    {
-                        //the client has disconnected from the server
-                        break;
-                    }
+                        try
+                        {
+                            //blocks until a client sends a message
+                            bytesRead = clientStream.Read(message, 0, tcpClient.ReceiveBufferSize);
+                            file.Write(message);
+                        }
+                        catch
+                        {
+                            //a socket error has occured
+                            break;
+                        }
 
-                    //message has successfully been received
-                    ASCIIEncoding encoder = new ASCIIEncoding();
-                    Console.WriteLine(encoder.GetString(message, 0, bytesRead));
-                    if (bytesRead != 0)
-                    {
-                        break;
+                        if (bytesRead == 0)
+                        {
+                            //the client has disconnected from the server
+                            break;
+                        }
+
+                        //message has successfully been received
+
+
+                        if (message.Equals(StevenFileSendTelemetry.terminalBoy))
+                        {
+                            Console.WriteLine("Terminal string received -- Done reading file");
+                            break;
+                        }
+
+                        //Console.WriteLine(encoder.GetString(message, 0, bytesRead));
+                        if (bytesRead != 0)
+                        {
+                            break;
+                        }
                     }
                 }
                 TalkBackToClient(tcpClient);
@@ -186,14 +203,33 @@ namespace VenturaFTP
                     //https://stackoverflow.com/questions/2972600/no-connection-could-be-made-because-the-target-machine-actively-refused-it
 
                     NetworkStream clientStream = client.GetStream();
-
+                    clientStream.Write(Encoding.ASCII.GetBytes(filePath), 0, filePath.Length);
                     ASCIIEncoding encoder = new ASCIIEncoding();
-                    string please = StevenFileSendTelemetry.StringToSendFromFile(filePath);
-                    byte[] buffer = encoder.GetBytes(please);
+                    
+                    using (Stream f = new FileStream(filePath, FileMode.Open))
+                    {
+                        int offset = 0;
+                        long len = f.Length;
+                        
+
+                        int readLen = client.SendBufferSize; // using chunks of 100 for default
+                        byte[] buffer = new byte[readLen];
+                        while (offset < len)
+                        {
+                            Console.WriteLine("offset= " + offset + ", len= " + len);
+                            /*if (offset + readLen > len)
+                            {
+                                readLen = (int)len - offset;
+                            }*/
+                            offset += f.Read(buffer, 0, readLen);
+                            clientStream.Write(buffer, 0, buffer.Length);
+                        }
 
 
-                    clientStream.Write(buffer, 0, buffer.Length);
-                    Console.WriteLine("it should have sent");
+                    }
+                    clientStream.Write(StevenFileSendTelemetry.terminalBoy, 0, StevenFileSendTelemetry.terminalBoy.Length);
+
+                    
                     byte[] receiveBuffer = new byte[4096];
                     int bytesRead = clientStream.Read(receiveBuffer,0,4096);
                     Console.WriteLine("Recieved text: " + encoder.GetString(receiveBuffer, 0, bytesRead));
